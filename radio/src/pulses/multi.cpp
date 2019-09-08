@@ -31,6 +31,10 @@
 #define MULTI_CHANS                         16
 #define MULTI_CHAN_BITS                     11
 
+#if defined(MULTIMODUL_ANALYSER)
+extern uint8_t MultiModuleAnalyserActive;
+#endif
+
 static void sendFrameProtocolHeader(uint8_t port, bool failsafe);
 
 void sendChannels(uint8_t port);
@@ -147,6 +151,16 @@ void sendChannels(uint8_t port)
 
 void sendFrameProtocolHeader(uint8_t port, bool failsafe)
 {// byte 1+2, protocol information
+
+#if defined(MULTIMODUL_ANALYSER)
+  if (MultiModuleAnalyserActive == 1) {
+    sendByteSbus(0x54);
+    sendByteSbus(22);
+    sendByteSbus(0);
+    sendByteSbus(0);
+    return;
+  }
+#endif
 
   // Our enumeration starts at 0
   int type = g_model.moduleData[port].getMultiProtocol(false) + 1;

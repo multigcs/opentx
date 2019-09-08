@@ -223,6 +223,9 @@ bool menuRadioHardware(event_t event);
 bool menuRadioCalibration(event_t event);
 bool menuRadioSpectrumAnalyser(event_t event);
 bool menuRadioPowerMeter(event_t event);
+#if defined(MULTIMODUL_ANALYSER)
+bool menuMultiModuleAnalyser(event_t event);
+#endif
 
 extern const MenuHandlerFunc menuTabGeneral[MENU_RADIO_PAGES_COUNT];
 

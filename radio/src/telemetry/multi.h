@@ -140,4 +140,16 @@ enum MultiBindStatus : uint8_t {
 
 extern uint8_t multiBindStatus;
 
+#if defined(MULTIMODUL_ANALYSER)
+#define MULTIMODUL_ANALYSER_CHANNELS 98
+#define MULTIMODUL_ANALYSER_SCALE 12
+
+struct MultiModuleAnalyser {
+  uint8_t data[MULTIMODUL_ANALYSER_CHANNELS];
+  uint8_t max[MULTIMODUL_ANALYSER_CHANNELS];
+};
+
+extern MultiModuleAnalyser multiModuleAnalyser;
+#endif
+
 #endif //OPENTX_MULTI_H

@@ -23,6 +23,9 @@
 
 MultiModuleStatus multiModuleStatus;
 MultiModuleSyncStatus multiSyncStatus;
+#if defined(MULTIMODUL_ANALYSER)
+MultiModuleAnalyser multiModuleAnalyser;
+#endif
 uint8_t multiBindStatus = MULTI_NORMAL_OPERATION;
 
 
@@ -35,7 +38,9 @@ enum MultiPacketTypes : uint8_t {
   FlyskyIBusTelemetry,
   ConfigCommand,
   InputSync,
-  FrskySportPolling
+  FrskySportPolling,
+  HitecTelemetry,
+  SpectrumScannerPacket
 };
 
 enum MultiBufferState : uint8_t {
@@ -96,6 +101,14 @@ static void processMultiSyncPacket(const uint8_t *data)
 #endif
 }
 
+#if defined(MULTIMODUL_ANALYSER)
+static void processMultiScannerPacket(const uint8_t *data)
+{
+  if (data[0] < MULTIMODUL_ANALYSER_CHANNELS) {
+    multiModuleAnalyser.data[data[0]] = data[1] * MULTIMODUL_ANALYSER_SCALE;
+  }
+}
+#endif
 
 static void processMultiTelemetryPaket(const uint8_t *packet)
 {
@@ -162,6 +175,15 @@ static void processMultiTelemetryPaket(const uint8_t *packet)
         TRACE("MP Sending sport data out.");
         sportSendBuffer(outputTelemetryBuffer.data, outputTelemetryBuffer.size);
       }
+      break;
+#endif
+
+#if defined(MULTIMODUL_ANALYSER)
+    case SpectrumScannerPacket:
+      if (len == 2)
+        processMultiScannerPacket(data);
+      else
+        TRACE("[MP] Received spectrum scanner len %d != 2", len);
       break;
 #endif
 
@@ -471,4 +493,75 @@ void processMultiTelemetryData(const uint8_t data)
   }
 
 }
+
+#if defined(MULTIMODUL_ANALYSER)
+#define DRAW_Y (LCD_H - MENU_FOOTER_HEIGHT - 12)
+#define DRAW_H (LCD_H - MENU_HEADER_HEIGHT - MENU_FOOTER_HEIGHT - 12)
+#define DRAW_XS ((LCD_W - 4) / MULTIMODUL_ANALYSER_CHANNELS)
+#define DRAW_MAXVAL 160
+
+uint8_t MultiModuleAnalyserActive = 0;
+
+bool menuMultiModuleAnalyser(event_t event)
+{
+  SUBMENU(STR_MENU_SPECTRUM_ANALYSER, ICON_RADIO_SPECTRUM_ANALYSER, 1, {1});
+
+  if (menuEvent) {
+    MultiModuleAnalyserActive = 0;
+    lcdDrawCenteredText(LCD_H/2, STR_STOPPING);
+    lcdRefresh();
+    watchdogSuspend(300);
+    RTOS_WAIT_MS(300);
+    return false;
+  }
+
+  MultiModuleAnalyserActive = 1;
+
+  lcdDrawFilledRect(0, MENU_HEADER_HEIGHT, LCD_W, DRAW_H, SOLID, OVERLAY_COLOR);
+  int maxv = 0;
+  int maxvch = 0;
+  for (int ch=0; ch<MULTIMODUL_ANALYSER_CHANNELS; ch++) {
+    if (multiModuleAnalyser.max[ch] < multiModuleAnalyser.data[ch]) {
+      multiModuleAnalyser.max[ch] = multiModuleAnalyser.data[ch];
+    }
+    if (maxv < multiModuleAnalyser.data[ch]) {
+      maxv = multiModuleAnalyser.data[ch];
+      maxvch = ch;
+    }
+    for (int y=0; y<=multiModuleAnalyser.data[ch] * DRAW_H / DRAW_MAXVAL; y+=1) {
+      lcdDrawPointColor(2 + ch * DRAW_XS - 1, DRAW_Y - y, RGB(200 + y * 55 / DRAW_H, 255 - (y * 255 / DRAW_H), 0));
+      lcdDrawPointColor(2 + ch * DRAW_XS, DRAW_Y - y, RGB(200 + y * 55 / DRAW_H, 255 - (y * 255 / DRAW_H), 0));
+      lcdDrawPointColor(2 + ch * DRAW_XS + 1, DRAW_Y - y, RGB(200 + y * 55 / DRAW_H, 255 - (y * 255 / DRAW_H), 0));
+
+    }
+    lcdDrawPointColor(2 + ch * DRAW_XS - 1, DRAW_Y - (multiModuleAnalyser.max[ch] * DRAW_H / DRAW_MAXVAL), YELLOW);
+    lcdDrawPointColor(2 + ch * DRAW_XS, DRAW_Y - (multiModuleAnalyser.max[ch] * DRAW_H / DRAW_MAXVAL), YELLOW);
+    lcdDrawPointColor(2 + ch * DRAW_XS + 1, DRAW_Y - (multiModuleAnalyser.max[ch] * DRAW_H / DRAW_MAXVAL), YELLOW);
+
+    if (ch > 0 && ch % 10 == 0) {
+      lcdDrawPointColor(2 + ch * DRAW_XS, DRAW_Y + 1, TEXT_COLOR);
+      lcdDrawPointColor(2 + ch * DRAW_XS, DRAW_Y + 2, TEXT_COLOR);
+      lcdDrawNumber(2 + ch * DRAW_XS - 12, DRAW_Y + 1, 2400 + ch, TINSIZE | TEXT_COLOR);
+    }
+  }
+
+  lcdDrawText(2 + (MULTIMODUL_ANALYSER_CHANNELS + 1) * DRAW_XS, DRAW_Y + 1, "Mhz", TINSIZE | TEXT_COLOR);
+
+  for (int ch=0; ch<MULTIMODUL_ANALYSER_CHANNELS; ch++) {
+    if (multiModuleAnalyser.max[ch] > 0) {
+      multiModuleAnalyser.max[ch]--;
+    }
+  }
+
+  int ty = 5;
+  lcdDrawText(LCD_W - 80, MENU_HEADER_HEIGHT + ty, "MaxRSSI:", TINSIZE | TEXT_INVERTED_COLOR);
+  lcdDrawNumber(LCD_W - 80 + 50, MENU_HEADER_HEIGHT + ty, maxv / MULTIMODUL_ANALYSER_SCALE, TINSIZE | TEXT_INVERTED_COLOR);
+  ty += 10;
+  lcdDrawText(LCD_W - 80, MENU_HEADER_HEIGHT + ty, "MaxCH:", TINSIZE | TEXT_INVERTED_COLOR);
+  lcdDrawNumber(LCD_W - 80 + 50, MENU_HEADER_HEIGHT + ty, 2400 + maxvch, TINSIZE | TEXT_INVERTED_COLOR);
+  ty += 10;
+
+  return true;
+}
+#endif
 

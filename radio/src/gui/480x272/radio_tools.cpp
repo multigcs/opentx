@@ -98,6 +98,9 @@ bool menuRadioTools(event_t event)
   if (isPXX2ModuleOptionAvailable(reusableBuffer.radioTools.modules[EXTERNAL_MODULE].information.modelID, MODULE_OPTION_POWER_METER))
     addRadioModuleTool(index++, STR_POWER_METER_EXT, menuRadioPowerMeter, EXTERNAL_MODULE);
 #endif
+#if defined(MULTIMODUL_ANALYSER)
+  addRadioModuleTool(index++, STR_SPECTRUM_ANALYSER_EXT, menuMultiModuleAnalyser, EXTERNAL_MODULE);
+#endif
 
 #if defined(LUA)
   FILINFO fno;
