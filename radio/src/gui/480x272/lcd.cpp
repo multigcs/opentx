@@ -429,6 +429,14 @@ void lcdDrawPoint(coord_t x, coord_t y, LcdFlags att)
   }
 }
 
+void lcdDrawPointColor(coord_t x, coord_t y, display_t color)
+{
+  display_t * p = PIXEL_PTR(x, y);
+  if (p < DISPLAY_END) {
+    *p = color;
+  }
+}
+
 void lcdDrawBlackOverlay()
 {
   lcdDrawFilledRect(0, 0, LCD_W, LCD_H, SOLID, OVERLAY_COLOR | OPACITY(8));

@@ -169,6 +169,7 @@ void putsChnLetter(coord_t x, coord_t y, uint8_t idx, LcdFlags attr);
 
 void lcdDrawAlphaPixel(display_t * p, uint8_t opacity, uint16_t color);
 void lcdDrawPoint(coord_t x, coord_t y, LcdFlags att=0);
+void lcdDrawPointColor(coord_t x, coord_t y, display_t color); 
 
 inline void lcdDrawSolidHorizontalLine(coord_t x, coord_t y, coord_t w, LcdFlags att)
 {
