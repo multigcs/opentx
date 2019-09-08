@@ -177,12 +177,14 @@ class DefaultTheme: public Theme
 
       delete calibHorus;
 #if defined(PCBX10)
-      if(STICKS_PWM_ENABLED()) {
+  #if PCBREV==T16
+      calibHorus = BitmapBuffer::load(getThemePath("T16.bmp"));
+  #else
+      if (STICKS_PWM_ENABLED())
         calibHorus = BitmapBuffer::load(getThemePath("X10S.bmp"));
-      }
-      else {
+      else
         calibHorus = BitmapBuffer::load(getThemePath("X10.bmp"));
-      }
+  #endif
 #else
       calibHorus = BitmapBuffer::load(getThemePath("horus.bmp"));
 #endif

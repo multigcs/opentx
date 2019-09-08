@@ -183,10 +183,17 @@
   #define TRIMS_GPIO_PIN_RVU            GPIO_Pin_12 // PJ.12
   #define TRIMS_GPIO_REG_RHR            GPIOD->IDR
   #define TRIMS_GPIO_PIN_RHR            GPIO_Pin_7  // PD.07
+#if PCBREV==T16
+  #define TRIMS_GPIO_REG_LSD            GPIOJ->IDR
+  #define TRIMS_GPIO_PIN_LSD            GPIO_Pin_8  // PJ.08
+  #define TRIMS_GPIO_REG_LSU            GPIOD->IDR
+  #define TRIMS_GPIO_PIN_LSU            GPIO_Pin_13 // PD.13
+#else 
   #define TRIMS_GPIO_REG_LSU            GPIOJ->IDR
   #define TRIMS_GPIO_PIN_LSU            GPIO_Pin_8  // PJ.08
   #define TRIMS_GPIO_REG_LSD            GPIOD->IDR
   #define TRIMS_GPIO_PIN_LSD            GPIO_Pin_13 // PD.13
+#endif
   #define TRIMS_GPIO_REG_RSU            GPIOB->IDR
   #define TRIMS_GPIO_PIN_RSU            GPIO_Pin_14 // PB.14
   #define TRIMS_GPIO_REG_RSD            GPIOB->IDR
@@ -206,12 +213,20 @@
 #elif defined(PCBX10)
   #define KEYS_GPIOB_PINS               (SWITCHES_GPIO_PIN_B_L | SWITCHES_GPIO_PIN_C_L | TRIMS_GPIO_PIN_RSU | TRIMS_GPIO_PIN_RSD | TRIMS_GPIO_PIN_LHL | TRIMS_GPIO_PIN_LHR)
   #define KEYS_GPIOC_PINS               (TRIMS_GPIO_PIN_LHL)
-  #define KEYS_GPIOD_PINS               (SWITCHES_GPIO_PIN_C_H | TRIMS_GPIO_PIN_RHL | TRIMS_GPIO_PIN_RHR | TRIMS_GPIO_PIN_LSD)
+  #if PCBREV==T16
+    #define KEYS_GPIOD_PINS               (SWITCHES_GPIO_PIN_C_H | TRIMS_GPIO_PIN_RHL | TRIMS_GPIO_PIN_RHR | TRIMS_GPIO_PIN_LSU)
+  #else
+    #define KEYS_GPIOD_PINS               (SWITCHES_GPIO_PIN_C_H | TRIMS_GPIO_PIN_RHL | TRIMS_GPIO_PIN_RHR | TRIMS_GPIO_PIN_LSD)
+  #endif
   #define KEYS_GPIOE_PINS               (SWITCHES_GPIO_PIN_E_L)
   #define KEYS_GPIOG_PINS               (SWITCHES_GPIO_PIN_D_L | SWITCHES_GPIO_PIN_G_H | SWITCHES_GPIO_PIN_G_L | SWITCHES_GPIO_PIN_H | TRIMS_GPIO_PIN_LVD)
   #define KEYS_GPIOH_PINS               (GPIO_Pin_3 | GPIO_Pin_4 | GPIO_Pin_9 | GPIO_Pin_10 | GPIO_Pin_11 | GPIO_Pin_12 | GPIO_Pin_14 | GPIO_Pin_15)
   #define KEYS_GPIOI_PINS               (GPIO_Pin_4 | GPIO_Pin_5 | GPIO_Pin_6 | GPIO_Pin_7 | GPIO_Pin_8 | GPIO_Pin_11 | GPIO_Pin_15)
-  #define KEYS_GPIOJ_PINS               (SWITCHES_GPIO_PIN_D_H | TRIMS_GPIO_PIN_LVU | TRIMS_GPIO_PIN_RVD | TRIMS_GPIO_PIN_RVU | TRIMS_GPIO_PIN_LSU)
+  #if PCBREV==T16
+    #define KEYS_GPIOJ_PINS               (SWITCHES_GPIO_PIN_D_H | TRIMS_GPIO_PIN_LVU | TRIMS_GPIO_PIN_RVD | TRIMS_GPIO_PIN_RVU | TRIMS_GPIO_PIN_LSD) 
+  #else
+    #define KEYS_GPIOJ_PINS               (SWITCHES_GPIO_PIN_D_H | TRIMS_GPIO_PIN_LVU | TRIMS_GPIO_PIN_RVD | TRIMS_GPIO_PIN_RVU | TRIMS_GPIO_PIN_LSU)
+  #endif
 #endif
 
 // ADC

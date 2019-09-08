@@ -57,7 +57,11 @@
 #define USBD_VID                            0x0483
 
 #define USBD_LANGID_STRING                  0x409
-#define USBD_MANUFACTURER_STRING            "FrSky"
+#if PCBREV==T16
+  #define USBD_MANUFACTURER_STRING            "Jumper"
+#else
+  #define USBD_MANUFACTURER_STRING            "FrSky"
+#endif
 #define USBD_SERIALNUMBER_FS_STRING         "00000000001B"
 
 

@@ -70,7 +70,11 @@ void bootloaderDrawScreen(BootloaderState st, int opt, const char* str)
     
     if (st == ST_START) {
 
+#if PCBREV==T16
+        bootloaderDrawTitle(88, "JUMPER BOOTLOADER");
+#else
         bootloaderDrawTitle(88, "HORUS BOOTLOADER");
+#endif
         
         lcdDrawBitmapPattern(90, 72, LBM_FLASH, TEXT_COLOR);
         lcdDrawText(124,  75, "Write Firmware");
