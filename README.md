@@ -3,7 +3,7 @@
 This is a experimental port of OpenTX 2.3 to the Jumper-T16 Transmitter
 
 CMake-Options:
- -DTRANSLATIONS=DE -DPCB=T16 -DGVARS=YES -DLUA=YES -DDEBUG=NO
+ -DTRANSLATIONS=DE -DPCB=X10 -DPCBREV=T16 -DGVARS=YES -DLUA=YES -DDEBUG=NO
 
 Binarys: 
 * http://www.multixmedia.org/opentx-2.3-t16.bin
